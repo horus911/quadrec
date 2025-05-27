@@ -1,0 +1,37 @@
+# QuadRec
+
+**QuadRec** is an all-in-one media recorder web app that allows you to capture:
+
+- Audio (microphone)
+- Video (camera + microphone)
+- Text (typed notes)
+- Images (webcam photos)
+
+## Features
+
+- Start and stop recording audio and video directly in the browser
+- Write and save text notes
+- Capture webcam photos instantly
+- Download all recorded media as files
+
+## How to use
+
+1. Open the `index.html` file in a modern browser (Chrome, Firefox, Edge).
+2. For audio and video recording, allow microphone and camera access when prompted.
+3. Use the buttons to start and stop recording.
+4. For text, type your notes and save them.
+5. For images, start the camera and take a photo.
+6. Download your recordings using the download links.
+
+## Requirements
+
+- Modern web browser with support for MediaDevices API and MediaRecorder API.
+- No server needed; works locally or hosted on any static server.
+
+## License
+
+MIT License — free to use and modify.
+
+---
+
+Created with ❤️ by QuadRec Team
