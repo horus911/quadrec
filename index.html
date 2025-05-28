@@ -1,263 +1,157 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  QuadRec is an all-in-one web application that lets you easily record audio, video, text, and images directly from your browser. Whether you're a creator, student, or professional, QuadRec offers a simple, fast, and installation-free solution.
-  
-  <title>Audio, Video, Text & Image Recorder</title>
-  <style>
-    video, audio, canvas {
-      border: 1px solid #ccc;
-      max-width: 100%;
-      margin-bottom: 10px;
-    }
-    button {
-      margin: 5px 10px 15px 0;
-      padding: 8px 16px;
-    }
-    .section {
-      margin-bottom: 30px;
-    }
-    textarea {
-      width: 100%;
-      height: 100px;
-      margin-bottom: 10px;
-      font-size: 1rem;
-      padding: 10px;
-    }
-    #textOutput {
-      white-space: pre-wrap;
-      background: #f0f0f0;
-      border: 1px solid #ccc;
-      padding: 10px;
-      min-height: 80px;
-      margin-bottom: 10px;
-    }
-    #imagePreview {
-      max-width: 320px;
-      border: 1px solid #ccc;
-      display: block;
-      margin-bottom: 10px;
-    }
-  </style>
+  <title>QuadRec</title>
+  <link rel="stylesheet" href="style.css" />
+  <script async src="https://static.addtoany.com/menu/page.js"></script>
 </head>
 <body>
-
-  <h1>Audio, Video, Text & Image Recorder</h1>
-
-  <!-- AUDIO -->
-  <div class="section">
-    <h2>Record Audio (microphone only)</h2>
-    <button id="startAudio">Start Audio</button>
-    <button id="stopAudio" disabled>Stop Audio</button><br>
-    <audio id="audioPlayback" controls style="display:none;"></audio><br>
-    <a id="downloadAudio" href="#" download="recorded-audio.webm" style="display:none;">Download Audio</a>
+  <div class="header">
+    <img src="assets/logo.png" alt="Logo QuadRec" class="logo" />
+    <h1>🎙️ QuadRec</h1>
+    <p>Enregistrez du texte, des images, de l’audio ou de la vidéo.</p>
+    <p><em>Record text, images, audio or video.</em></p>
   </div>
 
-  <!-- VIDEO -->
-  <div class="section">
-    <h2>Record Video (camera + microphone)</h2>
-    <video id="videoPreview" autoplay muted playsinline style="width: 320px; height: 240px; background: #000;"></video><br>
-    <button id="startVideo">Start Video</button>
-    <button id="stopVideo" disabled>Stop Video</button><br>
-    <video id="videoPlayback" controls style="display:none; max-width: 100%;"></video><br>
-    <a id="downloadVideo" href="#" download="recorded-video.webm" style="display:none;">Download Video</a>
+  <div class="button-bar">
+    <button onclick="addText()">📝 Ajouter Texte</button>
+    <button onclick="addImage()">🖼️ Ajouter Image</button>
+
+    <!-- Audio -->
+    <button id="btn-audio-start" onclick="startAudio()">▶️ Audio</button>
+    <button id="btn-audio-stop" onclick="stopAudio()">⏹️</button>
+
+    <!-- Vidéo -->
+    <button id="btn-video-start" onclick="startVideo()">▶️ Vidéo</button>
+    <button id="btn-video-stop" onclick="stopVideo()">⏹️</button>
   </div>
 
-  <!-- TEXT -->
   <div class="section">
-    <h2>Record Text</h2>
-    <textarea id="textInput" placeholder="Write your text here..."></textarea><br>
-    <button id="saveTextBtn">Save Text</button><br>
-    <div id="textOutput" style="display:none;"></div>
-    <a id="downloadText" href="#" download="recorded-text.txt" style="display:none;">Download Text</a>
+    <h2>📝 Texte enregistré</h2>
+    <textarea id="text-output" readonly>Votre texte apparaîtra ici...</textarea>
+    <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+      <a class="a2a_button_facebook"></a>
+      <a class="a2a_button_x"></a>
+      <a class="a2a_button_whatsapp"></a>
+      <a class="a2a_button_telegram"></a>
+      <a class="a2a_button_email"></a>
+    </div>
   </div>
 
-  <!-- IMAGE -->
   <div class="section">
-    <h2>Take a Photo with Webcam</h2>
-    <video id="imageVideo" autoplay muted playsinline style="width: 320px; height: 240px; background: #000;"></video><br>
-    <button id="startImageCamera">Start Camera</button>
-    <button id="takePhoto" disabled>Take Photo</button><br>
-    <canvas id="canvas" style="display:none;"></canvas><br>
-    <img id="imagePreview" alt="Captured photo" style="display:none;">
-    <a id="downloadImage" href="#" download="photo.png" style="display:none;">Download Photo</a>
+    <h2>🖼️ Image enregistrée</h2>
+    <img id="image-output" src="assets/sample.jpg" alt="Image enregistrée" style="max-width: 100%" />
+    <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+      <a class="a2a_button_facebook"></a>
+      <a class="a2a_button_x"></a>
+      <a class="a2a_button_whatsapp"></a>
+      <a class="a2a_button_telegram"></a>
+      <a class="a2a_button_email"></a>
+    </div>
   </div>
 
-<script>
-  // ======= Audio Recording =======
-  let mediaRecorderAudio;
-  let chunksAudio = [];
+  <div class="section">
+    <h2>🎤 Audio enregistré</h2>
+    <audio id="audio-output" controls></audio>
+    <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+      <a class="a2a_button_facebook"></a>
+      <a class="a2a_button_x"></a>
+      <a class="a2a_button_whatsapp"></a>
+      <a class="a2a_button_telegram"></a>
+      <a class="a2a_button_email"></a>
+    </div>
+  </div>
 
-  const startAudioBtn = document.getElementById('startAudio');
-  const stopAudioBtn = document.getElementById('stopAudio');
-  const audioPlayback = document.getElementById('audioPlayback');
-  const downloadAudio = document.getElementById('downloadAudio');
+  <div class="section">
+    <h2>🎥 Vidéo enregistrée</h2>
+    <video id="video-output" controls width="100%"></video>
+    <div class="a2a_kit a2a_kit_size_32 a2a_default_style">
+      <a class="a2a_button_facebook"></a>
+      <a class="a2a_button_x"></a>
+      <a class="a2a_button_whatsapp"></a>
+      <a class="a2a_button_telegram"></a>
+      <a class="a2a_button_email"></a>
+    </div>
+  </div>
 
-  startAudioBtn.addEventListener('click', async () => {
-    try {
-      const streamAudio = await navigator.mediaDevices.getUserMedia({ audio: true });
-      mediaRecorderAudio = new MediaRecorder(streamAudio);
+  <script>
+    let audioRecorder,
+      audioStream,
+      audioChunks = [];
+    let videoRecorder,
+      videoStream,
+      videoChunks = [];
 
-      mediaRecorderAudio.ondataavailable = e => {
-        if (e.data.size > 0) chunksAudio.push(e.data);
-      };
-
-      mediaRecorderAudio.onstop = () => {
-        const blob = new Blob(chunksAudio, { type: 'audio/webm' });
-        chunksAudio = [];
-        const url = URL.createObjectURL(blob);
-
-        audioPlayback.src = url;
-        audioPlayback.style.display = 'block';
-
-        downloadAudio.href = url;
-        downloadAudio.style.display = 'inline';
-      };
-
-      mediaRecorderAudio.start();
-      startAudioBtn.disabled = true;
-      stopAudioBtn.disabled = false;
-      audioPlayback.style.display = 'none';
-      downloadAudio.style.display = 'none';
-
-    } catch (err) {
-      alert('Microphone access error: ' + err);
-    }
-  });
-
-  stopAudioBtn.addEventListener('click', () => {
-    mediaRecorderAudio.stop();
-    startAudioBtn.disabled = false;
-    stopAudioBtn.disabled = true;
-  });
-
-  // ======= Video Recording =======
-  let mediaRecorderVideo;
-  let chunksVideo = [];
-  let videoStream;
-
-  const videoPreview = document.getElementById('videoPreview');
-  const startVideoBtn = document.getElementById('startVideo');
-  const stopVideoBtn = document.getElementById('stopVideo');
-  const videoPlayback = document.getElementById('videoPlayback');
-  const downloadVideo = document.getElementById('downloadVideo');
-
-  startVideoBtn.addEventListener('click', async () => {
-    try {
-      videoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      videoPreview.srcObject = videoStream;
-
-      mediaRecorderVideo = new MediaRecorder(videoStream);
-
-      mediaRecorderVideo.ondataavailable = e => {
-        if (e.data.size > 0) chunksVideo.push(e.data);
-      };
-
-      mediaRecorderVideo.onstop = () => {
-        const blob = new Blob(chunksVideo, { type: 'video/webm' });
-        chunksVideo = [];
-        const url = URL.createObjectURL(blob);
-
-        videoPlayback.src = url;
-        videoPlayback.style.display = 'block';
-
-        downloadVideo.href = url;
-        downloadVideo.style.display = 'inline';
-
-        videoStream.getTracks().forEach(track => track.stop());
-        videoPreview.srcObject = null;
-      };
-
-      mediaRecorderVideo.start();
-      startVideoBtn.disabled = true;
-      stopVideoBtn.disabled = false;
-      videoPlayback.style.display = 'none';
-      downloadVideo.style.display = 'none';
-
-    } catch (err) {
-      alert('Camera/microphone access error: ' + err);
-    }
-  });
-
-  stopVideoBtn.addEventListener('click', () => {
-    mediaRecorderVideo.stop();
-    startVideoBtn.disabled = false;
-    stopVideoBtn.disabled = true;
-  });
-
-  // ======= Text Recording =======
-  const textInput = document.getElementById('textInput');
-  const saveTextBtn = document.getElementById('saveTextBtn');
-  const textOutput = document.getElementById('textOutput');
-  const downloadText = document.getElementById('downloadText');
-
-  saveTextBtn.addEventListener('click', () => {
-    const text = textInput.value.trim();
-    if (!text) {
-      alert("Text is empty!");
-      return;
+    function addText() {
+      const text = prompt("Écris ton texte ici :");
+      if (text) document.getElementById("text-output").value = text;
     }
 
-    textOutput.textContent = text;
-    textOutput.style.display = 'block';
-
-    const blob = new Blob([text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-
-    downloadText.href = url;
-    downloadText.style.display = 'inline';
-  });
-
-  // ======= Take a Photo =======
-  const imageVideo = document.getElementById('imageVideo');
-  const startImageCameraBtn = document.getElementById('startImageCamera');
-  const takePhotoBtn = document.getElementById('takePhoto');
-  const canvas = document.getElementById('canvas');
-  const imagePreview = document.getElementById('imagePreview');
-  const downloadImage = document.getElementById('downloadImage');
-
-  let imageStream;
-
-  startImageCameraBtn.addEventListener('click', async () => {
-    try {
-      imageStream = await navigator.mediaDevices.getUserMedia({ video: true });
-      imageVideo.srcObject = imageStream;
-
-      startImageCameraBtn.disabled = true;
-      takePhotoBtn.disabled = false;
-    } catch (err) {
-      alert('Camera access error: ' + err);
+    function addImage() {
+      const input = document.createElement("input");
+      input.type = "file";
+      input.accept = "image/*";
+      input.onchange = () => {
+        const file = input.files[0];
+        if (file) {
+          const img = document.getElementById("image-output");
+          img.src = URL.createObjectURL(file);
+        }
+      };
+      input.click();
     }
-  });
 
-  takePhotoBtn.addEventListener('click', () => {
-    const width = imageVideo.videoWidth;
-    const height = imageVideo.videoHeight;
+    async function startAudio() {
+      audioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      audioRecorder = new MediaRecorder(audioStream);
+      audioChunks = [];
 
-    canvas.width = width;
-    canvas.height = height;
+      document.getElementById("btn-audio-start").classList.add("recording");
 
-    const ctx = canvas.getContext('2d');
-    ctx.drawImage(imageVideo, 0, 0, width, height);
+      audioRecorder.ondataavailable = (e) => audioChunks.push(e.data);
+      audioRecorder.onstop = () => {
+        const blob = new Blob(audioChunks, { type: "audio/webm" });
+        document.getElementById("audio-output").src = URL.createObjectURL(blob);
+        audioStream.getTracks().forEach((track) => track.stop());
+        document.getElementById("btn-audio-start").classList.remove("recording");
+      };
 
-    canvas.toBlob(blob => {
-      const url = URL.createObjectURL(blob);
-      imagePreview.src = url;
-      imagePreview.style.display = 'block';
+      audioRecorder.start();
+    }
 
-      downloadImage.href = url;
-      downloadImage.style.display = 'inline';
-    }, 'image/png');
+    function stopAudio() {
+      if (audioRecorder && audioRecorder.state === "recording") {
+        audioRecorder.stop();
+      }
+    }
 
-    imageStream.getTracks().forEach(track => track.stop());
-    imageVideo.srcObject = null;
+    async function startVideo() {
+      videoStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: true,
+      });
+      videoRecorder = new MediaRecorder(videoStream);
+      videoChunks = [];
 
-    startImageCameraBtn.disabled = false;
-    takePhotoBtn.disabled = true;
-  });
-</script>
+      document.getElementById("btn-video-start").classList.add("recording");
 
+      videoRecorder.ondataavailable = (e) => videoChunks.push(e.data);
+      videoRecorder.onstop = () => {
+        const blob = new Blob(videoChunks, { type: "video/webm" });
+        document.getElementById("video-output").src = URL.createObjectURL(blob);
+        videoStream.getTracks().forEach((track) => track.stop());
+        document.getElementById("btn-video-start").classList.remove("recording");
+      };
+
+      videoRecorder.start();
+    }
+
+    function stopVideo() {
+      if (videoRecorder && videoRecorder.state === "recording") {
+        videoRecorder.stop();
+      }
+    }
+  </script>
 </body>
 </html>
-________________________________________
